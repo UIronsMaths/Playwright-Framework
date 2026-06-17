@@ -1,0 +1,7 @@
+﻿{
+    "allure": {
+        "directory": "artifacts/allure-results",
+    "links": [],
+    "title": "SauceDemo Automation Report"
+    }
+}

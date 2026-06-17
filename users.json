@@ -1,0 +1,14 @@
+[
+  {
+      "testname":  "Valid user logs in",
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "expected": "success"
+  },
+  {
+      "testname":  "Locked out user tries to log in",
+    "username": "locked_out_user",
+    "password": "secret_sauce",
+    "expected": "failure"
+  }
+]

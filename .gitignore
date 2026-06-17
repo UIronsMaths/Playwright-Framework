@@ -1,0 +1,9 @@
+# Visual Studio workspace
+.vs/
+
+# Build folders
+bin/
+obj/
+
+# Test results
+*.trx
