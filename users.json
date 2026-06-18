@@ -1,14 +1,62 @@
 [
   {
-      "testname":  "Valid user logs in",
+    "testname":  "Valid user logs in",
     "username": "standard_user",
     "password": "secret_sauce",
-    "expected": "success"
+    "expected": "SUCCESS"
   },
   {
-      "testname":  "Locked out user tries to log in",
+    "testname": "Locked out user tries to log in",
     "username": "locked_out_user",
     "password": "secret_sauce",
-    "expected": "failure"
+    "expected": "FAILURE"
+  },
+  {
+    "testname": "Empty username tries to log in",
+    "username": "",
+    "password": "secret_sauce",
+    "expected": "FAILURE"
+  },
+  {
+    "testname": "Emp[ty password tries to log in",
+    "username": "standard_user",
+    "password": "",
+    "expected": "FAILURE"
+  },
+  {
+    "testname": "Blank username + pw tries to log in",
+    "username": "",
+    "password": "",
+    "expected": "FAILURE"
+  },
+  {
+    "testname": "Invalid username tries to log in",
+    "username": "im_invalid",
+    "password": "secret_sauce",
+    "expected": "FAILURE"
+  },
+  {
+    "testname": "Spaces in valid username tries to log in",
+    "username": "standard_user ",
+    "password": "secret_sauce",
+    "expected": "FAILURE"
+  },
+  {
+    "testname": "Spaces in valid pw tries to log in",
+    "username": "standard_user",
+    "password": "secret_sauce ",
+    "expected": "FAILURE"
+  },
+  {
+    "testname": "SQL injection tries to log in",
+    "username": "' OR '1'='1",
+    "password": "' OR '1'='1",
+    "expected": "FAILURE"
+  },
+  {
+    "testname": "XSS tries to log in",
+    "username": "<script>alert('xss')</script>",
+    "password": "secret_sauce",
+    "expected": "FAILURE"
   }
 ]

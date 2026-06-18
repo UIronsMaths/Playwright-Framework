@@ -6,8 +6,8 @@ using System.IO;
 
 public class UserData
 {
-    [JsonProperty("testName")]
-    public string? TestName { get; set; }
+    [JsonProperty("testname")]
+    public string? Testname { get; set; }
 
     [JsonProperty("username")]
     public string Username { get; set; } = string.Empty;

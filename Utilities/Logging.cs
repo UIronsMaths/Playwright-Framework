@@ -15,11 +15,12 @@ public static class Logging
             Directory.CreateDirectory(ArtifactPaths.Logs);
 
             const string template =
-                "{Timestamp:HH:mm:ss.fff} [{Level:u3}] (T{ThreadId}) [{Browser}] {TestName} | {Message:lj}{NewLine}{Exception}";
+                "{Timestamp:HH:mm:ss.fff} [{Level:u3}] (T{ThreadId}) [{TestId}] [{Browser}] {TestName} | {Message:lj}{NewLine}{Exception}";
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
+                .Enrich.WithThreadId()
                 .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: template)
                 .WriteTo.File(
                     Path.Combine(ArtifactPaths.Logs, "playwright-.log"),

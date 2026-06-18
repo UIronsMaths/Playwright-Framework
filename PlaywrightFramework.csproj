@@ -9,6 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Allure.Net.Commons" Version="2.15.0" />
 		<PackageReference Include="Allure.NUnit" Version="2.15.0" />
 		<PackageReference Include="coverlet.collector" Version="6.0.2" />
 		<PackageReference Include="CsvHelper" Version="33.1.0" />
@@ -29,6 +30,7 @@
 		<PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
 		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+		<PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

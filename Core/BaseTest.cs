@@ -5,7 +5,6 @@ using PlaywrightCSharpFramework.Config;
 using PlaywrightCSharpFramework.Reporting;
 using PlaywrightCSharpFramework.Utilities;
 using Serilog;
-using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,62 +13,54 @@ namespace PlaywrightCSharpFramework.Core;
 
 public abstract class PlaywrightTestBase
 {
-    private readonly string? _browserOverride;
-    private readonly Stopwatch _stopwatch = new();
-    // logging context disposables (OneTimeSetup only)
-    private readonly List<IDisposable> _logContextDisposables = new();
-
     protected FrameworkSettings Settings { get; private set; } = null!;
     protected IPlaywright Playwright { get; private set; } = null!;
     protected IBrowser Browser { get; private set; } = null!;
     protected IBrowserContext Context { get; private set; } = null!;
     protected IPage Page { get; private set; } = null!;
-    // Logging removed: no logger field
+    protected string BrowserName { get; }
 
-    protected PlaywrightTestBase(string? browser = null) => _browserOverride = browser;
+    // Built fresh in SetUpAsync with TestId/TestName/Browser baked in via ForContext.
+    // Use this instead of the static Log.Information(...) anywhere inside a test
+    // (SetUp, the test body, TearDown). Unlike LogContext/AsyncLocal, this is just
+    // a field on the test instance, so it survives thread hops under parallel
+    // execution without any ambient-context flow required.
+    protected ILogger TestLog { get; private set; } = Log.Logger;
+
+    protected PlaywrightTestBase(string browserName = "chromium")
+    {
+        BrowserName = browserName;
+    }
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        // Initialize logging so tests can optionally use Log.Logger or LogContext
         Logging.Configure();
-
         Settings = SettingsLoader.Load();
-        if (_browserOverride is not null) Settings.Browser = _browserOverride;
-        // Push minimal logging context for the fixture lifetime only
-        _logContextDisposables.Add(LogContext.PushProperty("Machine", Environment.MachineName));
-        _logContextDisposables.Add(LogContext.PushProperty("OS", RuntimeInformation.OSDescription));
-        _logContextDisposables.Add(LogContext.PushProperty("Runtime", RuntimeInformation.FrameworkDescription));
-        _logContextDisposables.Add(LogContext.PushProperty("Browser", Settings.Browser));
-    }
-
-    [OneTimeTearDown]
-    public void OneTimeTearDown()
-    {
-        // dispose pushed logging context properties
-        foreach (var d in _logContextDisposables)
-        {
-            try { d.Dispose(); } catch { }
-        }
-        _logContextDisposables.Clear();
     }
 
     [SetUp]
     public async Task SetUpAsync()
     {
         var testName = TestContext.CurrentContext.Test.Name;
-        _stopwatch.Restart();
-        ExtentReportManager.StartTest(testName);
+        var testId = TestContext.CurrentContext.Test.ID;
+
+        TestLog = Log.Logger
+            .ForContext("TestId", testId)
+            .ForContext("TestName", testName)
+            .ForContext("Browser", BrowserName);
 
         Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
         Browser = await LaunchBrowserAsync();
-        // Logging removed: browser launch version not logged
+
+        ExtentReportManager.StartTest($"{testName} [{BrowserName}]");
 
         Context = await Browser.NewContextAsync(new()
         {
             BaseURL = Settings.BaseUrl,
             RecordVideoDir = Settings.RecordVideo ? ArtifactPaths.Videos : null
         });
+
         Context.SetDefaultTimeout(Settings.ActionTimeoutMilliseconds);
         Context.SetDefaultNavigationTimeout(Settings.NavigationTimeoutMilliseconds);
 
@@ -79,22 +70,17 @@ public abstract class PlaywrightTestBase
         }
 
         Page = await Context.NewPageAsync();
-
-        // Logging removed: page ready information not logged
+        TestLog.Information("Started test {TestName}", testName);
     }
 
     [TearDown]
     public async Task TearDownAsync()
     {
-        _stopwatch.Stop();
         var result = TestContext.CurrentContext.Result;
         bool failed = result.Outcome.Status == TestStatus.Failed;
         string safeName = string.Concat(TestContext.CurrentContext.Test.Name
             .Select(ch => Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch));
         string stamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
-
-        if (failed) { Log.Information($"Test FAILED: {result.Message}"); }
-        else { Log.Information("Test PASSED"); }
 
         try
         {
@@ -112,7 +98,6 @@ public abstract class PlaywrightTestBase
                 if (failed)
                 {
                     await Context.Tracing.StopAsync(new() { Path = trace });
-                    // Logging removed: trace saved path not logged
                 }
                 else
                 {
@@ -125,15 +110,15 @@ public abstract class PlaywrightTestBase
         }
         finally
         {
+            ExtentReportManager.EndTest();
             await Context.CloseAsync();
             await Browser.CloseAsync();
             Playwright.Dispose();
-            ExtentReportManager.Flush();
-            // Logging removed: disposal debug message
+            // ExtentReportManager.Flush() intentionally NOT called here.
+            // It now runs exactly once, in AssemblyTearDown's [OneTimeTearDown],
+            // after all fixtures/tests in the run have finished.
         }
     }
-
-    // Page diagnostics and logging removed
 
     private async Task<IBrowser> LaunchBrowserAsync()
     {
@@ -142,7 +127,8 @@ public abstract class PlaywrightTestBase
             Headless = Settings.Headless,
             SlowMo = Settings.SlowMoMilliseconds
         };
-        return Settings.Browser.ToLowerInvariant() switch
+        var browserName = !string.IsNullOrWhiteSpace(BrowserName) ? BrowserName : Settings.Browser;
+        return browserName.ToLowerInvariant() switch
         {
             "firefox" => await Playwright.Firefox.LaunchAsync(options),
             "webkit" => await Playwright.Webkit.LaunchAsync(options),
