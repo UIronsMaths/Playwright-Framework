@@ -21,7 +21,7 @@ public sealed class CartPage : BasePage
 
     public async Task<CheckoutStepOnePage> ProceedToCheckoutAsync()
     {
-        Log.Debug("  Step: Proceeding to checkout");
+        //Log.Debug("  Step: Proceeding to checkout");
         await CheckoutButton.ClickAsync();
         await Page.WaitForURLAsync("**/checkout-step-one.html");
 
@@ -30,7 +30,7 @@ public sealed class CartPage : BasePage
 
     public async Task<InventoryPage> ContinueShoppingAsync()
     {
-        Log.Debug("  Step: Continuing shopping from cart");
+        //Log.Debug("  Step: Continuing shopping from cart");
         await ContinueShoppingButton.ClickAsync();
         await Page.WaitForURLAsync("**/inventory.html");
 

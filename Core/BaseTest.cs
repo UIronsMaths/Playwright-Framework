@@ -98,6 +98,7 @@ public abstract class PlaywrightTestBase
                 if (failed)
                 {
                     await Context.Tracing.StopAsync(new() { Path = trace });
+                    AllureApi.AddAttachment("Failure trace", "application/zip", trace);
                 }
                 else
                 {
@@ -111,7 +112,27 @@ public abstract class PlaywrightTestBase
         finally
         {
             ExtentReportManager.EndTest();
-            await Context.CloseAsync();
+
+            string? videoPath = null;
+            if (Settings.RecordVideo)
+            {
+                videoPath = await Page.Video!.PathAsync();
+            }
+
+            await Context.CloseAsync(); // finalizes the video file
+
+            if (Settings.RecordVideo && videoPath is not null)
+            {
+                if (failed)
+                {
+                    AllureApi.AddAttachment("Failure video", "video/webm", videoPath);
+                }
+                else if (File.Exists(videoPath))
+                {
+                    File.Delete(videoPath);
+                }
+            }
+
             await Browser.CloseAsync();
             Playwright.Dispose();
             // ExtentReportManager.Flush() intentionally NOT called here.

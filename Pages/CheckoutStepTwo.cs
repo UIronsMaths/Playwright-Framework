@@ -16,7 +16,7 @@ public sealed class CheckoutStepTwoPage : BasePage
 
     public async Task<CheckoutCompletePage> FinishAsync()
     {
-        Log.Debug("  Step: Finishing checkout (step two)");
+        //Log.Debug("  Step: Finishing checkout (step two)");
         await FinishButton.ClickAsync();
         await Page.WaitForURLAsync("**/checkout-complete.html");
 
@@ -25,7 +25,7 @@ public sealed class CheckoutStepTwoPage : BasePage
 
     public async Task<CartPage> CancelAsync()
     {
-        Log.Debug("  Step: Cancelling checkout at step two");
+        //Log.Debug("  Step: Cancelling checkout at step two");
         await CancelButton.ClickAsync();
         await Page.WaitForURLAsync("**/cart.html");
 

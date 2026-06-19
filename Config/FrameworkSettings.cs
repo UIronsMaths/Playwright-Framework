@@ -16,4 +16,6 @@ public sealed class FrameworkSettings
     public string ExtentReportDirectory { get; set; } = "Artifacts/Extent";
     public string LogDirectory { get; set; } = "Artifacts/Logs";
     public string BaseDirectory { get; set; } = string.Empty;
+    public string Username { get; set;  } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }

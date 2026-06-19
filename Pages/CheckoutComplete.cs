@@ -15,7 +15,7 @@ public sealed class CheckoutCompletePage : BasePage
 
     public async Task<InventoryPage> BackHomeAsync()
     {
-        Log.Debug(" Clicking Back Home from checkout complete");
+        //Log.Debug(" Clicking Back Home from checkout complete");
         await BackHomeButton.ClickAsync();
         await Page.WaitForURLAsync("**/inventory.html");
 

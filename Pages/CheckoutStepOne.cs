@@ -19,7 +19,7 @@ public sealed class CheckoutStepOnePage : BasePage
 
     public async Task<CheckoutStepTwoPage> ContinueAsync(string firstName, string lastName, string postalCode)
     {
-        Log.Debug("  Step: Filling checkout-step-one: {FirstName} {LastName} {PostalCode}", firstName, lastName, postalCode);
+        //Log.Debug("  Step: Filling checkout-step-one: {FirstName} {LastName} {PostalCode}", firstName, lastName, postalCode);
 
         await FirstName.FillAsync(firstName);
         await LastName.FillAsync(lastName);
@@ -33,7 +33,7 @@ public sealed class CheckoutStepOnePage : BasePage
 
     public async Task<CartPage> CancelAsync()
     {
-        Log.Debug("  Step: Cancelling checkout at step one");
+        //Log.Debug("  Step: Cancelling checkout at step one");
         await CancelButton.ClickAsync();
         await Page.WaitForURLAsync("**/cart.html");
 

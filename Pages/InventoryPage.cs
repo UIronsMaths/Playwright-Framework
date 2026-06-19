@@ -82,29 +82,29 @@ public sealed class InventoryPage : BasePage
 
     public async Task AddToCartByNameAsync(string itemName)
     {
-        Log.Debug("  Step: Adding item to cart: {ItemName}", itemName);
+        //Log.Debug("  Step: Adding item to cart: {ItemName}", itemName);
 
         var item = InventoryItems.Filter(new() { Has = Page.Locator(".inventory_item_name", new() { HasTextString = itemName }) });
         var btn = item.Locator("button");
 
         var btnTextBefore = await btn.InnerTextAsync();
         var btnClass = await btn.GetAttributeAsync("class");
-        Log.Debug("  Step: Button before click: text='{ButtonText}', class='{ButtonClass}'", btnTextBefore, btnClass);
+        //Log.Debug("  Step: Button before click: text='{ButtonText}', class='{ButtonClass}'", btnTextBefore, btnClass);
 
         await btn.ClickAsync();
 
         var btnTextAfter = await btn.InnerTextAsync();
-        Log.Debug("  Step: Button after click: text='{ButtonText}'", btnTextAfter);
+        //Log.Debug("  Step: Button after click: text='{ButtonText}'", btnTextAfter);
 
         await Page.WaitForFunctionAsync(
             "btn => btn.textContent.trim() === 'Remove'",
-            await btn.ElementHandleAsync(),
+            await btn.ElementHandleAsync());
             //new() { Timeout = new SettingsLoader.Load().ActionTimeoutMilliseconds });
     }
 
     public async Task RemoveFromCartByNameAsync(string itemName)
     {
-        Log.Debug("  Step: Removing item from cart: {ItemName}", itemName);
+        //Log.Debug("  Step: Removing item from cart: {ItemName}", itemName);
 
         var item = InventoryItems.Filter(new() { Has = Page.Locator(".inventory_item_name", new() { HasTextString = itemName }) });
         var btn = item.Locator("button");
@@ -113,7 +113,7 @@ public sealed class InventoryPage : BasePage
 
         await Page.WaitForFunctionAsync(
             "btn => btn.textContent.trim() === 'Add to cart'",
-            await btn.ElementHandleAsync(),
+            await btn.ElementHandleAsync());
             //new() { Timeout = new TestSettings().ExplicitWaitSeconds * 1000 });
     }
 
@@ -121,25 +121,25 @@ public sealed class InventoryPage : BasePage
 
     public async Task SortByNameAscAsync()
     {
-        Log.Debug("  Step: Sorting by name (A to Z)");
+        //Log.Debug("  Step: Sorting by name (A to Z)");
         await SortDropdown.SelectOptionAsync(new[] { "az" });
     }
 
     public async Task SortByNameDescAsync()
     {
-        Log.Debug("  Step: Sorting by name (Z to A)");
+        //Log.Debug("  Step: Sorting by name (Z to A)");
         await SortDropdown.SelectOptionAsync(new[] { "za" });
     }
 
     public async Task SortByPriceLowToHighAsync()
     {
-        Log.Debug("  Step: Sorting by price (low to high)");
+        //Log.Debug("  Step: Sorting by price (low to high)");
         await SortDropdown.SelectOptionAsync(new[] { "lohi" });
     }
 
     public async Task SortByPriceHighToLowAsync()
     {
-        Log.Debug("  Step: Sorting by price (high to low)");
+        //Log.Debug("  Step: Sorting by price (high to low)");
         await SortDropdown.SelectOptionAsync(new[] { "hilo" });
     }
 
@@ -147,7 +147,7 @@ public sealed class InventoryPage : BasePage
 
     public async Task<CartPage> GoToCartAsync()
     {
-        Log.Debug("  Step: Navigating to Cart page");
+        //Log.Debug("  Step: Navigating to Cart page");
         await CartLink.ClickAsync();
         await Page.WaitForURLAsync("**/cart.html");
 
